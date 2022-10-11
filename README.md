@@ -85,9 +85,9 @@ fi
 find source_images -type f -name '*.jpg' -exec chown root:root {} \;
 ```
 
-Le script en question présente une vulnerabilité. En effet, "find" n'est pas défini avec son chemin absolu, on va pouvoir en abuser pour obtenir un shell root.
+Le script en question présente une vulnérabilité. En effet, l'utilitaire "find" n'est pas défini avec son chemin absolu, on va pouvoir en abuser pour obtenir un shell root.
 
-On créer un fichier bash sous le nom de find dans "/tmp". Ce dernier va copier bash et lui attribuer le setuid Root.
+On créer un script Bash sous le nom de find dans "/tmp". Ce dernier va copier bash et lui attribuer le setuid Root.
 
 ![image](https://user-images.githubusercontent.com/33124690/195116301-aedbe85b-4dbb-4991-801b-fce196d24aa7.png)
 
