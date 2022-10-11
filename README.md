@@ -1,4 +1,7 @@
-# WriteUp de la box Photobomb
+<h1 align="center">
+  WriteUp de la box Photobomb
+  <br>
+</h1> 
 
 Bonjour à toutes et tous, aujourd'hui on s'attaque à la machine Photobomb sur HackTheBox. 
 
@@ -10,13 +13,13 @@ On commence par réaliser un NMAP afin de scanner les ports ouverts sur la machi
 
 ![image](https://user-images.githubusercontent.com/33124690/195099486-b77ad55d-e35f-4a74-bfea-d0e4a677d81e.png)
 
-On s'aperçoie que seul le port 80 (HTTP) ainsi que le port 22 (SSH) sont ouverts. On obtient aussi le nom de domaine (photobomb.htb) qu'il faudrait ajouter dans notre ficher "/etc/hosts"
+On s'aperçoit que seul le port 80 (HTTP) ainsi que le port 22 (SSH) sont ouverts. On obtient aussi le nom de domaine (photobomb.htb) qu'il faut ajouter dans notre ficher "/etc/hosts"
 
 Lorsque l'on se rend sur le site, on se rend compte qu'il n'y a pas grand chose, c'est un site vitrine (d'apparence). 
 
 ![image](https://user-images.githubusercontent.com/33124690/195100699-d756413d-d18f-4b08-9fb7-203ba7989aef.png)
 
-Un lien permet de se connecter pour accéder à une autre partie du site. Néanmoins, sans creds, impossible de se connecter, il va falloir trouver une solution. On peut quand même remarquer qu'en cas d'échec d'authentification, on est redirigés sur "/printers".
+Un lien permet de se connecter pour accéder à une autre partie du site. Néanmoins, sans creds, impossible de se connecter, il va falloir trouver une solution. On peut quand même remarquer qu'en cas d'échec d'authentification, on est redirigé sur "/printers".
 
 ![image](https://user-images.githubusercontent.com/33124690/195103675-392f6fa7-ed1d-4be0-9de6-2e5de3c0514c.png)
 
@@ -42,7 +45,7 @@ On lance Burp Suite afin d'étudier la requête qui est effectuée.
 
 ![image](https://user-images.githubusercontent.com/33124690/195108047-908809d1-3394-4012-a25f-12703ab17c57.png)
 
-On test plusieurs attaques comme du LFI sur la requète, rien ne fonctionnait jusqu'au moment où on test les injections de commandes.
+On test plusieurs attaques comme du LFI sur la requète, rien ne fonctionne jusqu'au moment où on test les injections de commandes.
 Comme on peut le voir ci-contre, il suffit d'ajouter "; {command}" à la suite d'un des trois paramètres pour que ce soit executé. 
 
 ![image](https://user-images.githubusercontent.com/33124690/195109920-3df43674-442e-49df-9c53-8e26194183dc.png)
@@ -62,11 +65,13 @@ Ainsi, on obtient un shell sur la machine pour récupérer le flag user.txt. On 
 
 ## Escalation de privilège
 
-On pourrait lancer Linpeas pour voir si il y a des chemins de privesc rapide, mais simplement à l'aide d'un ``` sudo -l``` on s'aperçoit que l'on peut lancer un script en temps que Root.
+On pourrait lancer Linpeas pour voir s'il y a des chemins de privesc rapide, mais simplement à l'aide d'un ```sudo -l``` on s'aperçoit que l'on peut lancer un script en temps que Root.
+
 ![image](https://user-images.githubusercontent.com/33124690/195114580-44b45d8f-1db3-4d1c-8b1b-0d7160f848ca.png)
 
-
 ```
+bash
+
 #!/bin/bash
 . /opt/.bashrc
 cd /home/wizard/photobomb
@@ -84,11 +89,11 @@ find source_images -type f -name '*.jpg' -exec chown root:root {} \;
 
 Le script en question présente une vulnerabilité. En effet, "find" n'est pas défini avec son chemin absolu, on va pouvoir en abuser pour obtenir un shell root.
 
-On créé un fichier bash sous le nom de find sans /tmp. Ce dernier va copier bash et lui attribuer le setuid Root.
+On créer un fichier bash sous le nom de find dans "/tmp". Ce dernier va copier bash et lui attribuer le setuid Root.
 
 ![image](https://user-images.githubusercontent.com/33124690/195116301-aedbe85b-4dbb-4991-801b-fce196d24aa7.png)
 
-On oublie pas de chmod notre script find.
+On oublie pas de "chmod +x" notre script find.
 
 Maintenant, il suffit de changer le path de notre utilisateur (an ajoutant "/tmp:") et de lancer le script :D
 
@@ -98,6 +103,4 @@ Et voilà !
 
 ![image](https://user-images.githubusercontent.com/33124690/195118182-d7881c4d-72f9-4887-87a3-895ca1ef5b4a.png)
 
-
 J'espère que ce premier WriteUp vous aura plus, j'en referai peut être à l'avenir.
-
