@@ -43,7 +43,7 @@ On lance Burp Suite afin d'étudier la requête qui est effectuée.
 ![image](https://user-images.githubusercontent.com/33124690/195108047-908809d1-3394-4012-a25f-12703ab17c57.png)
 
 On test plusieurs attaques comme du LFI sur la requète, rien ne fonctionnait jusqu'au moment où on test les injections de commandes.
-Comme on peut le voir ci-contre, il suffit d'ajouter "; {command}" à la suite d'un des trois paramètres pour que ce soit executé.
+Comme on peut le voir ci-contre, il suffit d'ajouter "; {command}" à la suite d'un des trois paramètres pour que ce soit executé. 
 
 ![image](https://user-images.githubusercontent.com/33124690/195109920-3df43674-442e-49df-9c53-8e26194183dc.png)
 
