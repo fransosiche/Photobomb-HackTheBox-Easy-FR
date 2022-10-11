@@ -70,8 +70,6 @@ On pourrait lancer Linpeas pour voir s'il y a des chemins de privesc rapide, mai
 ![image](https://user-images.githubusercontent.com/33124690/195114580-44b45d8f-1db3-4d1c-8b1b-0d7160f848ca.png)
 
 ```
-bash
-
 #!/bin/bash
 . /opt/.bashrc
 cd /home/wizard/photobomb
